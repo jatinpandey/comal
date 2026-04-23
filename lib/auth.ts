@@ -3,6 +3,7 @@
 // again. No accounts, no sessions, no revocation list — just a gate.
 
 export const AUTH_COOKIE = "comal_auth";
+export const DEVICE_COOKIE = "comal_did";
 
 export async function authTokenFor(password: string): Promise<string> {
   const bytes = new TextEncoder().encode(password);

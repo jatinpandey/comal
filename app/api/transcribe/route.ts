@@ -3,6 +3,10 @@
 // chunk). Forwards to Sarvam Speech-to-Text. If SARVAM_API_KEY is not set,
 // returns mock text so the UI is testable without a key.
 
+import { cookies } from "next/headers";
+import { DEVICE_COOKIE } from "@/lib/auth";
+import { logTranscript } from "@/lib/logStore";
+
 export const runtime = "nodejs";
 
 const MOCK_RESPONSE =
@@ -15,6 +19,9 @@ export async function POST(req: Request) {
   if (!(audio instanceof Blob)) {
     return Response.json({ error: "audio file required" }, { status: 400 });
   }
+
+  const jar = await cookies();
+  const did = jar.get(DEVICE_COOKIE)?.value ?? "unknown";
 
   const key = process.env.SARVAM_API_KEY;
 
@@ -59,7 +66,11 @@ export async function POST(req: Request) {
       transcript?: string;
       request_id?: string;
     };
-    return Response.json({ partial: data.transcript ?? "", final: true });
+    const text = data.transcript ?? "";
+    if (text) {
+      await logTranscript({ did, ts: Date.now(), text });
+    }
+    return Response.json({ partial: text, final: true });
   } catch (err) {
     return Response.json(
       { error: "upstream_failed", detail: String(err) },

@@ -57,6 +57,12 @@ Next.js here may be newer than your training data. Verify unfamiliar framework b
    - If `APP_PASSWORD` is unset the gate is a no-op — fine for local dev, never ship that way
    - Password is never hardcoded; rotate by changing the env var, which invalidates existing cookies
 
+8. **Successful transcriptions are logged to Upstash Redis**
+   - `lib/logStore.ts` appends `{did, ts, text}` to `transcripts:YYYY-MM-DD` lists
+   - `did` is the long-lived `comal_did` cookie (stamped by `proxy.ts`)
+   - Env vars `KV_REST_API_URL` / `KV_REST_API_TOKEN` come from Vercel's Upstash integration
+   - Missing env → logging is skipped silently; never block a transcription on a log failure
+
 ## State model
 Session states:
 - `idle`
