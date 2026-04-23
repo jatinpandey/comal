@@ -47,8 +47,7 @@ export function EditorCanvas({ items }: { items: TranscriptItem[] }) {
                 lineHeight: 1.6,
               }}
             >
-              Start writing, or hold <Kbd>Space</Kbd> and speak. Comal will
-              format as you talk.
+              Tap the mic, or hold <Kbd>Space</Kbd> and speak.
             </p>
           </>
         ) : (
