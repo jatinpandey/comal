@@ -47,6 +47,11 @@ Next.js here may be newer than your training data. Verify unfamiliar framework b
    - If `SARVAM_API_KEY` is absent, `/api/transcribe` returns mock text
    - Preserve mock mode so UI flows stay testable without credentials
 
+6. **Sarvam model is pinned to `saaras:v3` on `/speech-to-text`**
+   - Mode defaults to `transcribe` (keeps the spoken language), overridable via `SARVAM_MODE`
+   - `saarika` and earlier `saaras` variants are deprecated — do not reintroduce endpoint or model branching
+   - `/speech-to-text-translate` is not used; set `SARVAM_MODE=translate` instead if English output is needed
+
 ## State model
 Session states:
 - `idle`

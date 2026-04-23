@@ -36,8 +36,10 @@ export async function POST(req: Request) {
 
     const upstream = new FormData();
     upstream.append("file", cleaned, `recording.${ext}`);
-    upstream.append("language_code", process.env.SARVAM_LANGUAGE ?? "en-IN");
-    upstream.append("model", process.env.SARVAM_MODEL ?? "saarika:v2.5");
+    upstream.append("model", "saaras:v3");
+    // "transcribe" keeps the original language, "translate" forces English,
+    // "verbatim" skips normalization.
+    upstream.append("mode", process.env.SARVAM_MODE ?? "transcribe");
 
     const res = await fetch("https://api.sarvam.ai/speech-to-text", {
       method: "POST",
