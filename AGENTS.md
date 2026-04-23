@@ -52,6 +52,11 @@ Next.js here may be newer than your training data. Verify unfamiliar framework b
    - `saarika` and earlier `saaras` variants are deprecated — do not reintroduce endpoint or model branching
    - `/speech-to-text-translate` is not used; set `SARVAM_MODE=translate` instead if English output is needed
 
+7. **Deployed instances are password-gated**
+   - `proxy.ts` checks a SHA-256-of-`APP_PASSWORD` cookie and redirects unauthed page requests to `/login`; API routes get a 401
+   - If `APP_PASSWORD` is unset the gate is a no-op — fine for local dev, never ship that way
+   - Password is never hardcoded; rotate by changing the env var, which invalidates existing cookies
+
 ## State model
 Session states:
 - `idle`
