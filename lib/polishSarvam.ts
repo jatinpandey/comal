@@ -52,7 +52,13 @@ export async function polishWithSarvam(
     }
 
     const data = (await res.json()) as ChatCompletionResponse;
-    const out = (data.choices?.[0]?.message?.content ?? "").trim();
+    const raw = data.choices?.[0]?.message?.content ?? "";
+    // sarvam-m is a reasoning model that prefixes its answer with
+    // <think>...</think>. Strip any such blocks before returning.
+    const out = raw
+      .replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .replace(/^[\s\S]*?<\/think>/i, "")
+      .trim();
 
     const elapsed = Date.now() - start;
     console.log(
