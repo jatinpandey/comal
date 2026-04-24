@@ -63,11 +63,11 @@ Next.js here may be newer than your training data. Verify unfamiliar framework b
    - Env vars `KV_REST_API_URL` / `KV_REST_API_TOKEN` come from Vercel's Upstash integration
    - Missing env → logging is skipped silently; never block a transcription on a log failure
 
-9. **Polish layer is spec-driven**
-   - `prompts/polish.md` is the source of truth for how raw transcripts are cleaned/formatted — edit it as markdown
-   - `lib/polish.ts` reads the spec at module load and sends it to Claude as the system prompt; raw user transcript is the user message
-   - Model pinned to `claude-sonnet-4-6`, overridable via `ANTHROPIC_MODEL`
-   - Missing `ANTHROPIC_API_KEY` → polish silently passes raw text through; never let a polish failure drop a transcription
+9. **Polish layer is spec-driven and provider-swappable**
+   - `prompts/polish.md` is the source of truth for how raw transcripts are cleaned/formatted — edit it as markdown, `lib/polishSpec.ts` reads it at module load
+   - `lib/polish.ts` is a dispatcher — routes to `polishSarvam.ts` (default, uses `SARVAM_API_KEY` against Sarvam's OpenAI-compatible chat completion endpoint) or `polishAnthropic.ts` (Claude) based on `POLISH_PROVIDER`
+   - Anthropic code is preserved even when not in use — don't delete it
+   - Any provider failure (missing key, non-2xx, thrown exception) silently falls back to the raw transcript; never let polish drop a transcription
    - `next.config.ts` uses `outputFileTracingIncludes` to ship `prompts/**` with the serverless bundle — don't remove that
 
 ## State model
