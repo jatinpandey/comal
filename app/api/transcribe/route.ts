@@ -80,7 +80,12 @@ export async function POST(req: Request) {
       ...(polished.model ? { raw, model: polished.model } : {}),
     });
 
-    return Response.json({ partial: polished.text, final: true });
+    return Response.json({
+      partial: polished.text,
+      final: true,
+      polished: polished.model !== null,
+      model: polished.model,
+    });
   } catch (err) {
     return Response.json(
       { error: "upstream_failed", detail: String(err) },

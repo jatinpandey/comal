@@ -183,7 +183,32 @@ export default async function LogsPage({
                       >
                         {formatTime(e.ts)}
                       </span>
-                      <span>{e.text}</span>
+                      <div>
+                        <div style={{ whiteSpace: "pre-wrap" }}>{e.text}</div>
+                        {e.raw && e.raw !== e.text && (
+                          <details
+                            style={{
+                              marginTop: 4,
+                              fontSize: 12,
+                              color: T.color.mute,
+                            }}
+                          >
+                            <summary style={{ cursor: "pointer" }}>
+                              raw
+                              {e.model ? ` · ${e.model}` : ""}
+                            </summary>
+                            <div
+                              style={{
+                                marginTop: 4,
+                                whiteSpace: "pre-wrap",
+                                fontStyle: "italic",
+                              }}
+                            >
+                              {e.raw}
+                            </div>
+                          </details>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ol>

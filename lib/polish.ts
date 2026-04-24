@@ -29,9 +29,13 @@ export interface PolishResult {
 
 export async function polishTranscript(rawText: string): Promise<PolishResult> {
   const c = getClient();
-  if (!c) return { text: rawText, model: null };
+  if (!c) {
+    console.log("[comal] polish skipped: ANTHROPIC_API_KEY not set");
+    return { text: rawText, model: null };
+  }
 
   const model = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
+  const start = Date.now();
 
   try {
     const msg = await c.messages.create({
@@ -49,6 +53,10 @@ export async function polishTranscript(rawText: string): Promise<PolishResult> {
       .join("")
       .trim();
 
+    const elapsed = Date.now() - start;
+    console.log(
+      `[comal] polish ok · ${model} · ${elapsed}ms · ${rawText.length}ch → ${out.length}ch`
+    );
     return { text: out || rawText, model };
   } catch (err) {
     console.warn("[comal] polish failed, returning raw:", err);
