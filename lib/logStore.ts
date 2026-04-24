@@ -30,3 +30,23 @@ export async function logTranscript(entry: LoggedTranscript): Promise<void> {
     console.warn("[comal] transcript log failed:", err);
   }
 }
+
+export async function readTranscriptsForDay(
+  day: string
+): Promise<LoggedTranscript[] | null> {
+  const redis = getRedis();
+  if (!redis) return null;
+  const raw = await redis.lrange(`transcripts:${day}`, 0, -1);
+  return raw.map((item) => {
+    // @upstash/redis may return strings or pre-parsed objects depending on
+    // what was stored. Normalize either way.
+    if (typeof item === "string") {
+      try {
+        return JSON.parse(item) as LoggedTranscript;
+      } catch {
+        return { did: "?", ts: 0, text: item };
+      }
+    }
+    return item as LoggedTranscript;
+  });
+}
