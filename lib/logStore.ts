@@ -18,6 +18,8 @@ export interface LoggedTranscript {
   did: string;
   ts: number;
   text: string;
+  raw?: string;
+  model?: string;
 }
 
 export async function logTranscript(entry: LoggedTranscript): Promise<void> {

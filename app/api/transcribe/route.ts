@@ -6,6 +6,7 @@
 import { cookies } from "next/headers";
 import { DEVICE_COOKIE } from "@/lib/auth";
 import { logTranscript } from "@/lib/logStore";
+import { polishTranscript } from "@/lib/polish";
 
 export const runtime = "nodejs";
 
@@ -66,11 +67,20 @@ export async function POST(req: Request) {
       transcript?: string;
       request_id?: string;
     };
-    const text = data.transcript ?? "";
-    if (text) {
-      await logTranscript({ did, ts: Date.now(), text });
+    const raw = (data.transcript ?? "").trim();
+    if (!raw) {
+      return Response.json({ partial: "", final: true });
     }
-    return Response.json({ partial: text, final: true });
+
+    const polished = await polishTranscript(raw);
+    await logTranscript({
+      did,
+      ts: Date.now(),
+      text: polished.text,
+      ...(polished.model ? { raw, model: polished.model } : {}),
+    });
+
+    return Response.json({ partial: polished.text, final: true });
   } catch (err) {
     return Response.json(
       { error: "upstream_failed", detail: String(err) },

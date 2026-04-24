@@ -58,10 +58,17 @@ Next.js here may be newer than your training data. Verify unfamiliar framework b
    - Password is never hardcoded; rotate by changing the env var, which invalidates existing cookies
 
 8. **Successful transcriptions are logged to Upstash Redis**
-   - `lib/logStore.ts` appends `{did, ts, text}` to `transcripts:YYYY-MM-DD` lists
+   - `lib/logStore.ts` appends `{did, ts, text, raw?, model?}` to `transcripts:YYYY-MM-DD` lists
    - `did` is the long-lived `comal_did` cookie (stamped by `proxy.ts`)
    - Env vars `KV_REST_API_URL` / `KV_REST_API_TOKEN` come from Vercel's Upstash integration
    - Missing env → logging is skipped silently; never block a transcription on a log failure
+
+9. **Polish layer is spec-driven**
+   - `prompts/polish.md` is the source of truth for how raw transcripts are cleaned/formatted — edit it as markdown
+   - `lib/polish.ts` reads the spec at module load and sends it to Claude as the system prompt; raw user transcript is the user message
+   - Model pinned to `claude-sonnet-4-6`, overridable via `ANTHROPIC_MODEL`
+   - Missing `ANTHROPIC_API_KEY` → polish silently passes raw text through; never let a polish failure drop a transcription
+   - `next.config.ts` uses `outputFileTracingIncludes` to ship `prompts/**` with the serverless bundle — don't remove that
 
 ## State model
 Session states:
